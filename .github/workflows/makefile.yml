@@ -27,7 +27,7 @@ jobs:
 
       - name: Install ldid from source
         run: |
-          git clone https://github.com/theos/ldid.git
+          git clone https://github.com/ProcursusTeam/ldid
           cd ldid
           make
           sudo cp ./ldid /usr/local/bin/
