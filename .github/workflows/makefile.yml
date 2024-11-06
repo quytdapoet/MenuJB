@@ -1,24 +1,38 @@
-name: Makefile CI
+name: Build with Theos
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Clean
-      run: make clean
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl git ldid fakeroot dpkg-dev make
 
-    - name: Make
-      run: make
+      - name: Install Theos
+        run: |
+          git clone --recursive https://github.com/theos/theos.git $HOME/theos
+          echo 'export THEOS=$HOME/theos' >> $GITHUB_ENV
+          echo 'export PATH=$THEOS/bin:$PATH' >> $GITHUB_ENV
 
-    - name: Make package
-      run: make package
+      - name: Build with Theos
+        env:
+          THEOS: ${{ env.THEOS }}
+        run: |
+          make package
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: packages
+          path: ./packages/*.deb
