@@ -12,18 +12,25 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y curl git ldid fakeroot dpkg-dev make
+          sudo apt-get install -y curl git fakeroot dpkg-dev make clang
 
       - name: Install Theos
         run: |
           git clone --recursive https://github.com/theos/theos.git $HOME/theos
           echo 'export THEOS=$HOME/theos' >> $GITHUB_ENV
           echo 'export PATH=$THEOS/bin:$PATH' >> $GITHUB_ENV
+
+      - name: Install ldid from source
+        run: |
+          git clone https://github.com/theos/ldid.git
+          cd ldid
+          make
+          sudo cp ./ldid /usr/local/bin/
 
       - name: Build with Theos
         env:
